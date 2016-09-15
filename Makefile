@@ -1,35 +1,33 @@
-include $(TOPDIR)/rules.mk
+prefix = /usr/local
+exec_prefix = $(prefix)
+bindir = $(exec_prefix)/bin
 
-include version.mk
+W_NAME	= bully
+W_ROOT	= src
 
-include $(INCLUDE_DIR)/package.mk
+CFLAGS	+= -I$(W_ROOT) -I$(W_ROOT)/utils/ -I$(W_ROOT)/tls/ -I$(W_ROOT)/wps/ -I$(W_ROOT)/crypto/ -I$(W_ROOT)/common/
 
-define Package/bully
-  SECTION:=net
-  CATEGORY:=Network
-  SUBMENU:=wireless
-  TITLE:=Brute force attack against WPS, that actually works
-  DEPENDS:=+libpcap +libopenssl
-endef
+LDFLAGS += -lpcap -lssl -lcrypto
 
-define Package/bully/description
-  Brute force attack against WPS, that actually works
-endef
+HDRS	= $(W_ROOT)/$(W_NAME).h $(W_ROOT)/80211.h $(W_ROOT)/frame.h $(W_ROOT)/iface.h $(W_ROOT)/bswap.h $(W_ROOT)/version.h
+SRCS	= $(W_ROOT)/$(W_NAME).c $(W_ROOT)/80211.c $(W_ROOT)/frame.c $(W_ROOT)/iface.c $(W_ROOT)/crc32.c $(W_ROOT)/timer.c $(W_ROOT)/utils.c
 
-define Build/Prepare
-	mkdir -p $(PKG_BUILD_DIR)
-	$(CP) -rf ./src $(PKG_BUILD_DIR)/
-endef
+all: $(W_NAME)
 
-CONFIGURE_PATH:=src
+$(W_NAME): $(HDRS) $(SRCS)
+	$(CC) $(CFLAGS) -o $(@) $(W_ROOT)/$(W_NAME).c $(LDFLAGS)
 
-MAKE_PATH:=src
+strip: $(W_NAME)
+	strip $(W_NAME)
 
-TARGET_CFLAGS+=$(TARGET_CPPFLAGS)
+clean:
+	-rm -f $(W_NAME) $(W_NAME).o
 
-define Package/bully/install
-	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/bully $(1)/usr/bin/
-endef
+distclean: clean
 
-$(eval $(call BuildPackage,bully)) 
+install: all
+	install -d $(DESTDIR)$(bindir)
+	install -m 755 $(W_NAME) $(DESTDIR)$(bindir)
+
+uninstall:
+	-rm -f $(DESTDIR)$(bindir)/$(W_NAME)

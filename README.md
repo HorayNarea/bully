@@ -24,9 +24,8 @@ functionality.
 
 Bully can be built and installed by running:
 
-	~/bully$ cd src
-	~/bully/src$ make
-	~/bully/src$ sudo make install
+	~/bully$ make
+	~/bully$ sudo make install
 
 
 # LICENSE
@@ -45,33 +44,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 See LICENSE-file for full license text.
-
-
-# OPENWRT BUILDS
-
-A Makefile tested in Kamikaze r18801 (2.6.26) is provided in the repository root directory. Porting to
-Backfire or another OpenWrt variant should be fairly straightforward.
-
-Assuming you have ~/kamikaze as your openwrt directory and ~/bully for bully, the following steps should
-get you up and running:
-
-	cd ~/kamikaze
-	mkdir package/bully
-	cp -rf ~/bully/* ~/kamikaze/package/bully
-	make menuconfig
-
-Navigate to Network-->wireless and select bully (module or built-in), exit and save. If you elected to
-build as a package, type
-
-	make package/bully/{clean,compile} V=99
-	scp bin/packages/<arch>/bully_1.1-1_<arch>.ipk root@<router-ip>/tmp
-	ssh root@<router-ip>
-
-enter router password,
-
-	opkg install /tmp/bully*ipk
-
-If you chose to build bully into your firmware, make and install it as you normally would.
 
 
 # USAGE
